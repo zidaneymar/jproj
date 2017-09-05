@@ -1,0 +1,29 @@
+function (kw, cb) {
+    GM_xmlhttpRequest({
+      method: "GET",
+      url: "https://btdb.in/q/" + kw + "/",
+      onload: function (result) {
+        var doc = common.parsetext(result.responseText);
+        var data = [];
+        var t = doc.getElementsByClassName("item-title");
+        if (t) {
+          Array.from(t).forEach(function (elem) {
+            data.push({
+              "title": elem.firstChild.title,
+              "mag": elem.nextElementSibling.firstElementChild.href,
+              "size": elem.nextElementSibling.children[1].textContent,
+              "src": "https://btdb.in" + elem.firstChild.getAttribute("href"),
+            });
+          });
+        }
+        else {
+          data.push({
+            "title": "没有找到磁链接",
+            "mag": "",
+            "size": "0",
+            "src": result.finalUrl,
+          });
+        }
+
+        cb(result.finalUrl, data);
+      },
